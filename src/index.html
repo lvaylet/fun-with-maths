@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Math Fun</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #question {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .choice {
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div id="question"></div>
+    <div id="choices"></div>
+    <div id="result"></div>
+
+    <script>
+        async function fetchQuestion() {
+            const response = await fetch('/question');
+            return response.json();
+        }
+
+        async function checkAnswer(question, answer) {
+            const response = await fetch('/answer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question, answer }),
+            });
+            return response.json();
+        }
+
+        async function displayQuestion() {
+            const question = await fetchQuestion();
+            document.getElementById('question').textContent = `${question.a} ${question.operator} ${question.b} = ?`;
+
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = ''; // Clear previous choices
+
+            // Clear the result message
+            document.getElementById('result').textContent = '';
+            document.getElementById('result').style.color = ''; // Reset the color
+
+            question.choices.forEach(choice => {
+                const choiceDiv = document.createElement('div');
+                choiceDiv.className = 'choice';
+                choiceDiv.textContent = choice;
+                choiceDiv.addEventListener('click', async () => {
+                    const correct = await checkAnswer(question, choice);
+                    if (correct) {
+                        document.getElementById('result').textContent = 'Bravo !';
+                        document.getElementById('result').style.color = "green";
+                    } else {
+                        document.getElementById('result').textContent = 'Presque !';
+                        document.getElementById('result').style.color = "red";
+                    }
+                    setTimeout(displayQuestion, 1500); // New question after 1.5 seconds
+                });
+                choicesDiv.appendChild(choiceDiv);
+            });
+        }
+
+        displayQuestion();
+    </script>
+</body>
+</html>
