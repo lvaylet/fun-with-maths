@@ -1,29 +1,35 @@
-# Use a Rust base image
-FROM rust:1.75-slim as builder
+# --- Stage 1: Build the application ---
+FROM rust:1.82 AS builder
 
-# Set the working directory
+# Install the toolchain.
+RUN rustup toolchain install stable
+
+# Set the working directory inside the builder image.
 WORKDIR /app
 
-# Copy Cargo files
-COPY Cargo.toml Cargo.lock ./
+COPY . ./
 
-# Download dependencies
-RUN cargo fetch
+# Build the dependencies.
+RUN cargo fetch --locked
+RUN cargo build --locked
 
-# Copy source files
-COPY src ./src
+# Build the application in release mode (optimized).
+RUN cargo build --release --locked
 
-# Build the application (release mode)
-RUN cargo build --release
+# --- Stage 2: Create a lean runtime image ---
+FROM debian:bullseye-slim AS runner
 
-# Use a smaller runtime image
-FROM debian:bullseye-slim
+# Set the working directory in the runtime image.
+WORKDIR /app
 
-# Copy the built binary
+# Install minimal dependencies. If you need more, update this line.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Copy the built binary from the builder stage
 COPY --from=builder /app/target/release/fun-with-maths /app/fun-with-maths
 
-# Expose the port your application listens on
+# Expose the port your web server listens on.
 EXPOSE 3030
 
-# Run the application
+# Run the application.
 CMD ["/app/fun-with-maths"]
