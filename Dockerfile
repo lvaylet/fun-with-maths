@@ -1,31 +1,21 @@
-# --- Stage 1: Build the application ---
-FROM rust:1.82 AS builder
-
-# Set the working directory inside the builder image.
+FROM lukemathwalker/cargo-chef:latest-rust-1.82.0-alpine AS chef
 WORKDIR /app
 
-# Copy and build the dependencies.
-COPY Cargo.toml Cargo.lock ./
-# `cargo fetch` requires a dummy app.
-RUN mkdir src && echo "fn main() {}" > src/main.rs
-RUN cargo fetch --locked
-RUN cargo build --locked
+FROM chef AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
 
-# Build the application in release mode (optimized).
-COPY src src/
-RUN cargo build --release --locked
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+# Build application
+COPY . .
+RUN cargo build --release
 
-# --- Stage 2: Create a lean runtime image ---
-FROM gcr.io/distroless/cc-debian12 AS runner
-
-# Set the working directory in the runtime image.
+# We do not need the Rust toolchain to run the binary!
+FROM debian:bookworm-slim AS runtime
 WORKDIR /app
-
-# Copy the built binary from the builder stage
-COPY --from=builder /app/target/release/fun-with-maths .
-
-# Expose the port your web server listens on.
+COPY --from=builder /app/target/release/fun-with-maths /usr/local/bin
 EXPOSE 3030
-
-# Run the application.
-CMD ["./fun-with-maths"]
+ENTRYPOINT ["/usr/local/bin/fun-with-maths"]
