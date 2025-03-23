@@ -84,14 +84,21 @@
                     if (correct) {
                         document.getElementById('result').textContent = 'Bravo !';
                         document.getElementById('result').style.color = "green";
+                        playAudio('correct.mp3');
                     } else {
                         document.getElementById('result').textContent = 'Presque !';
                         document.getElementById('result').style.color = "red";
+                        playAudio('wrong.wav');
                     }
                     setTimeout(displayQuestion, 1500); // New question after 1.5 seconds
                 });
                 choicesDiv.appendChild(choiceDiv);
             });
+        }
+
+        function playAudio(filename) {
+            const audio = new Audio(`static/${filename}`);
+            audio.play();
         }
 
         displayQuestion();

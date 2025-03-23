@@ -88,7 +88,9 @@ async fn main() {
             .body(include_str!("index.html")) // Include the HTML file
     });
 
-    let routes = index.or(question_route).or(answer_route);
+    let static_assets = warp::path("static").and(warp::fs::dir("./static"));
+
+    let routes = index.or(question_route).or(answer_route).or(static_assets);
 
     warp::serve(routes).run(([0, 0, 0, 0], 3030)).await;
 }
