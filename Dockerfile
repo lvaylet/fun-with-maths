@@ -17,5 +17,6 @@ RUN cargo build --release
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
 COPY --from=builder /app/target/release/fun-with-maths /usr/local/bin
+COPY --from=builder /app/static /usr/local/bin
 EXPOSE 3030
 ENTRYPOINT ["/usr/local/bin/fun-with-maths"]
