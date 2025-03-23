@@ -9,22 +9,36 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: 100vh; /* Make body fill the entire viewport height */
+            width: 100vw; /* Make body fill the entire viewport width */
             margin: 0;
+            padding: 0;
         }
         #question {
-            font-size: 2em;
-            margin-bottom: 20px;
+            font-size: 8em;
+            margin-bottom: 30px;
+            text-align: center;
+            width: 90%; /* Take up most of the width */
+        }
+        #choices {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 90%; /* Take up most of the width */
         }
         .choice {
-            padding: 10px 20px;
-            margin: 5px;
-            border: 1px solid #ccc;
+            padding: 20px 40px;
+            margin: 10px;
+            border: 2px solid #ccc;
             cursor: pointer;
+            font-size: 5em;
+            text-align: center;
         }
         #result {
-            margin-top: 20px;
-            font-size: 1.5em;
+            margin-top: 30px;
+            font-size: 10em;
+            text-align: center;
+            width: 90%; /* Take up most of the width */
         }
     </style>
 </head>
