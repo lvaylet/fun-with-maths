@@ -16,7 +16,7 @@ RUN cargo build --release
 # We do not need the Rust toolchain to run the binary!
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
-COPY --from=builder /app/target/release/fun-with-maths /usr/local/bin
-COPY --from=builder /app/static /usr/local/bin
+COPY --from=builder /app/target/release/fun-with-maths .
+COPY --from=builder /app/static ./static
 EXPOSE 3030
-ENTRYPOINT ["/usr/local/bin/fun-with-maths"]
+ENTRYPOINT ["./fun-with-maths"]
