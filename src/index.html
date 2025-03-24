@@ -84,11 +84,11 @@
                     if (correct) {
                         document.getElementById('result').textContent = 'Bravo !';
                         document.getElementById('result').style.color = "green";
-                        playAudio('correct.mp3');
+                        playAudio('correct.wav');
                     } else {
                         document.getElementById('result').textContent = 'Presque !';
                         document.getElementById('result').style.color = "red";
-                        playAudio('wrong.wav');
+                        playAudio('wrong.mp3');
                     }
                     setTimeout(displayQuestion, 1500); // New question after 1.5 seconds
                 });
